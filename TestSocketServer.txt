@@ -1,0 +1,51 @@
+import java.net.*;
+import java.io.*;
+
+public class TestSocketServer {
+	public static void main(String[] args) {
+		try {
+			ServerSocket ss = new ServerSocket(5566);
+			Socket socket = ss.accept();
+			
+			DataOutputStream  dos = new DataOutputStream(socket.getOutputStream());
+			DataInputStream dis = new DataInputStream(socket.getInputStream());
+			String s = null;
+			if ((s = dis.readUTF()) != null) {
+				System.out.println("接收到的算式：" + s);
+				double result = 0;
+				String[] sarr1 = s.split("[\\+\\-\\*\\/]");
+				
+				double a = Double.parseDouble(sarr1[0].trim());
+				double b = Double.parseDouble(sarr1[1].trim());
+				
+				String[] sarr2 = s.split("^(-?\\d+)(\\.\\d+)?");
+				char c = sarr2[1].trim().charAt(0);
+				switch (c) {
+				case '+':
+					result = a + b;
+					break;
+				case '-':
+					result = a - b;
+					break;
+				case '*':
+					result = a * b;
+					break;
+				case '/':
+					result = a / b;
+					break;
+				default:
+					break;
+				}
+				dos.writeDouble(result);
+				dos.flush();
+			}
+			dis.close();
+			dos.close();
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		
+	}
+}
